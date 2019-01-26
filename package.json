@@ -1,0 +1,31 @@
+{
+  "name": "parse-mobx",
+  "version": "0.0.2",
+  "description": "A wrapper for ParseJS SDK to make Parse Objects observable in Mobx",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imana97/parse-mobx.git"
+  },
+  "keywords": [
+    "parse",
+    "parse",
+    "platform",
+    "parse",
+    "js",
+    "mobx",
+    "react-mobx",
+    "mobx-react",
+    "parse",
+    "mobx"
+  ],
+  "author": "Iman Khaghani-Far",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/imana97/parse-mobx/issues"
+  },
+  "homepage": "https://github.com/imana97/parse-mobx#readme"
+}
