@@ -189,8 +189,8 @@ export class ParseMobx {
      *
      * @returns {Promise<*>}
      */
-    async destroy(options) {
-        return this._parseObj.destroy(options);
+    destroy(options) {
+        this._parseObj.destroy(options);
     }
 
     /**
@@ -241,9 +241,13 @@ export class ParseMobx {
      * @param options
      * @returns {Promise<ParseMobx>}
      */
-    async fetch(options) {
-        const newParseObj = await this._parseObj.fetch(options);
-        return new ParseMobx(newParseObj);
+    fetch(options) {
+
+        return new Promise((resolve, reject)=>{
+            this._parseObj.fetch(options)
+                .then(newParseObj=>new ParseMobx(newParseObj))
+                .catch(reject);
+        });
     }
 
     /**
@@ -252,9 +256,12 @@ export class ParseMobx {
      * @param options
      * @returns {Promise<ParseMobx>}
      */
-    async fetchWithInclude(keys, options) {
-        const newParseObj = await this._parseObj.fetchWithInclude(keys, options);
-        return new ParseMobx(newParseObj);
+    fetchWithInclude(keys, options) {
+        return new Promise((resolve, reject) =>{
+            this._parseObj.fetchWithInclude(keys, options)
+                .then(newParseObj=>new ParseMobx(newParseObj))
+                .catch(reject);
+        });
     }
 
     /**
@@ -395,9 +402,15 @@ export class ParseMobx {
      * @returns {Promise<void>}
      */
     @action
-    async save(options) {
-        await this._parseObj.save(options);
-        runInAction(() => this.set("updatedAt", new Date().toISOString()));
+    save(options) {
+        return new Promise((resolve, reject) => {
+            this._parseObj.save(options)
+                .then(()=>{
+                    runInAction(() => this.set("updatedAt", new Date().toISOString()));
+                    resolve(this);
+                })
+                .catch(reject);
+        });
     }
 
     /**
