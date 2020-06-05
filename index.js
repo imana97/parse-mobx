@@ -1,8 +1,8 @@
 // Import from mobx
-import {action, configure, extendObservable, runInAction} from "mobx";
+import { action, configure, extendObservable, runInAction } from "mobx";
 
 // Configure mobx strictMode. so any changes to observable must be in actions.
-configure({enforceActions: "observed"});
+configure({ enforceActions: "observed" });
 
 /**
  * Main Class
@@ -24,7 +24,7 @@ export class ParseMobx {
 
         // copy id
         this.id = obj.id;
-        this.attributes = {createdAt: obj.get("createdAt")};
+        this.attributes = { createdAt: obj.get("createdAt") };
         // store props to be observed.
 
         const observableObject = {};
@@ -34,9 +34,9 @@ export class ParseMobx {
 
             if (attribute.constructor.name === "ParseObjectSubclass") {
                 this.attributes[key] = new ParseMobx(attribute);
-            } else if (attribute.constructor.name === "ParseObjectSubclass") {
+            } else if (Array.isArray(attribute)) {
                 observableObject[key] = attribute.map(el =>
-                    el.constructor.name === "ParseObjectSubclass" ? ParseMobx(el) : el
+                    el.constructor.name === "ParseObjectSubclass" ? ParseMobx(el) : (el.constructor.name !== "ParseRelation" && el.constructor.name !== "ParseACL") ? el : null
                 );
             } else if (
                 attribute.constructor.name !== "ParseRelation" &&
@@ -136,11 +136,11 @@ export class ParseMobx {
      */
     @action
     addAllUnique(attr, items) {
-        this._checkDefined(attr,[]);
+        this._checkDefined(attr, []);
         if (this._checkType(attr, "Array")) {
-            items.forEach(item=>{
+            items.forEach(item => {
                 if (this.attributes[attr].indexOf(item) === -1) {
-                    (item.constructor.name ==="ParseObjectSubclass")
+                    (item.constructor.name === "ParseObjectSubclass")
                         ? this.attributes[attr].push(new ParseMobx(item))
                         : this.attributes[attr].push(item);
                 }
@@ -162,7 +162,7 @@ export class ParseMobx {
         this._checkDefined(key, []);
         if (this._checkType(key, "Array")) {
             if (this.attributes[key].indexOf(value) === -1) {
-                (value.constructor.name ==="ParseObjectSubclass")
+                (value.constructor.name === "ParseObjectSubclass")
                     ? this.attributes[key].push(new ParseMobx(value))
                     : this.attributes[key].push(value);
             }
@@ -243,9 +243,9 @@ export class ParseMobx {
      */
     fetch(options) {
 
-        return new Promise((resolve, reject)=>{
+        return new Promise((resolve, reject) => {
             this._parseObj.fetch(options)
-                .then(newParseObj=>new ParseMobx(newParseObj))
+                .then(newParseObj => new ParseMobx(newParseObj))
                 .catch(reject);
         });
     }
@@ -257,9 +257,9 @@ export class ParseMobx {
      * @returns {Promise<ParseMobx>}
      */
     fetchWithInclude(keys, options) {
-        return new Promise((resolve, reject) =>{
+        return new Promise((resolve, reject) => {
             this._parseObj.fetchWithInclude(keys, options)
-                .then(newParseObj=>new ParseMobx(newParseObj))
+                .then(newParseObj => new ParseMobx(newParseObj))
                 .catch(reject);
         });
     }
@@ -405,7 +405,7 @@ export class ParseMobx {
     save(options) {
         return new Promise((resolve, reject) => {
             this._parseObj.save(options)
-                .then(()=>{
+                .then(() => {
                     runInAction(() => this.set("updatedAt", new Date().toISOString()));
                     resolve(this);
                 })
