@@ -29,6 +29,6 @@
   },
   "homepage": "https://github.com/imana97/parse-mobx#readme",
   "dependencies": {
-    "mobx": "^5.9.0"
+    "mobx": "^6.0.4"
   }
 }
