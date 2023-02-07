@@ -8,7 +8,7 @@ configure({ enforceActions: 'observed' });
 /**
  * Main Class
  */
-export class ParseMobx {
+export default class ParseMobx {
   @observable private readonly attributes: any;
   @observable loading = false;
   private readonly parseObj: any;
