@@ -17,7 +17,7 @@ configure({enforceActions: 'observed'});
 export class ParseMobx {
 
   @observable private readonly attributes: any;
-  @observable loading: boolean = false;
+  @observable loading = false;
   private readonly parseObj: any;
   private readonly id: string;
 
@@ -43,7 +43,7 @@ export class ParseMobx {
     // store props to be observed.
     const observableObject: any = {};
 
-    for (let key in obj.attributes) {
+    for (const key in obj.attributes) {
       const attribute = obj.attributes[key];
 
       if (attribute.constructor.name === 'ParseObjectSubclass') {
@@ -75,7 +75,7 @@ export class ParseMobx {
    * @param param
    * @returns {ParseMobx|<ParseMobx>|null}
    */
-  static toParseMobx(param: Parse.Object | Parse.Object[] | Function): any {
+  static toParseMobx(param: any): any {
     return typeof param === 'function'
         ? (obj: Parse.Object) => param(new ParseMobx(obj))
         : Array.isArray(param)
@@ -321,7 +321,7 @@ export class ParseMobx {
    * @returns {ParseMobx}
    */
   getACL(): Parse.ACL | undefined {
-    return this.parseObj.getACL(arguments);
+    return this.parseObj.getACL();
   }
 
   /**
