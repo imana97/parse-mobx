@@ -1,21 +1,14 @@
 // Import from mobx
-import {
-  action,
-  configure,
-  extendObservable,
-  makeObservable, observable,
-  runInAction
-} from 'mobx';
+import { action, configure, extendObservable, makeObservable, observable, runInAction } from 'mobx';
 import Parse from 'parse';
 
 // Configure mobx strictMode. so any changes to observable must be in actions.
-configure({enforceActions: 'observed'});
+configure({ enforceActions: 'observed' });
 
 /**
  * Main Class
  */
 export class ParseMobx {
-
   @observable private readonly attributes: any;
   @observable loading = false;
   private readonly parseObj: any;
@@ -38,7 +31,7 @@ export class ParseMobx {
 
     // copy id
     this.id = obj.id;
-    this.attributes = {createdAt: obj.get('createdAt')};
+    this.attributes = { createdAt: obj.get('createdAt') };
 
     // store props to be observed.
     const observableObject: any = {};
@@ -50,17 +43,16 @@ export class ParseMobx {
         this.attributes[key] = new ParseMobx(attribute);
       } else if (Array.isArray(attribute)) {
         observableObject[key] = attribute.map((el) =>
-            el.constructor.name === 'ParseObjectSubclass'
-                ? new ParseMobx(el)
-                : el.constructor.name !== 'ParseRelation' &&
-                el.constructor.name !== 'ParseACL'
-                    ? el
-                    : null,
+          el.constructor.name === 'ParseObjectSubclass'
+            ? new ParseMobx(el)
+            : el.constructor.name !== 'ParseRelation' && el.constructor.name !== 'ParseACL'
+            ? el
+            : null,
         );
       } else if (
-          attribute.constructor.name !== 'ParseRelation' &&
-          attribute.constructor.name !== 'ParseACL' &&
-          key !== 'createdAt'
+        attribute.constructor.name !== 'ParseRelation' &&
+        attribute.constructor.name !== 'ParseACL' &&
+        key !== 'createdAt'
       ) {
         observableObject[key] = attribute;
       }
@@ -77,12 +69,12 @@ export class ParseMobx {
    */
   static toParseMobx(param: any): any {
     return typeof param === 'function'
-        ? (obj: Parse.Object) => param(new ParseMobx(obj))
-        : Array.isArray(param)
-            ? param.map((obj: Parse.Object) => new ParseMobx(obj))
-            : param
-                ? new ParseMobx(param)
-                : null;
+      ? (obj: Parse.Object) => param(new ParseMobx(obj))
+      : Array.isArray(param)
+      ? param.map((obj: Parse.Object) => new ParseMobx(obj))
+      : param
+      ? new ParseMobx(param)
+      : null;
   }
 
   /**
@@ -92,8 +84,8 @@ export class ParseMobx {
    */
   static deleteListItemById(list: ParseMobx[], item: ParseMobx) {
     list.splice(
-        list.findIndex((obj: ParseMobx) => obj.getId() === item.getId()),
-        1,
+      list.findIndex((obj: ParseMobx) => obj.getId() === item.getId()),
+      1,
     );
   }
 
@@ -103,8 +95,7 @@ export class ParseMobx {
    * @param item
    */
   static updateListItem(list: ParseMobx[], item: ParseMobx) {
-    list[list.findIndex((obj: ParseMobx) => obj.getId() === item.getId())] =
-        item;
+    list[list.findIndex((obj: ParseMobx) => obj.getId() === item.getId())] = item;
   }
 
   /**
@@ -149,8 +140,8 @@ export class ParseMobx {
       items.forEach((item) => {
         if (this.attributes[attr].indexOf(item) === -1) {
           item.constructor.name === 'ParseObjectSubclass'
-              ? this.attributes[attr].push(new ParseMobx(item))
-              : this.attributes[attr].push(item);
+            ? this.attributes[attr].push(new ParseMobx(item))
+            : this.attributes[attr].push(item);
         }
       });
     }
@@ -171,8 +162,8 @@ export class ParseMobx {
     if (this.checkType(key, 'Array')) {
       if (this.attributes[key].indexOf(value) === -1) {
         value.constructor.name === 'ParseObjectSubclass'
-            ? this.attributes[key].push(new ParseMobx(value))
-            : this.attributes[key].push(value);
+          ? this.attributes[key].push(new ParseMobx(value))
+          : this.attributes[key].push(value);
       }
     }
     this.parseObj.addUnique(key, value);
@@ -205,9 +196,7 @@ export class ParseMobx {
    * Eventually Destroy an object on the server
    * @param options
    */
-  destroyEventually(
-      options?: Parse.Object.DestroyOptions | undefined,
-  ): Promise<this> {
+  destroyEventually(options?: Parse.Object.DestroyOptions | undefined): Promise<this> {
     return this.parseObj.destroyEventually(options);
   }
 
@@ -270,9 +259,9 @@ export class ParseMobx {
   fetch(options?: Parse.Object.FetchOptions | undefined): Promise<this> {
     return new Promise((resolve, reject) => {
       this.parseObj
-          .fetch(options)
-          .then((newParseObj: Parse.Object) => new ParseMobx(newParseObj))
-          .catch(reject);
+        .fetch(options)
+        .then((newParseObj: Parse.Object) => new ParseMobx(newParseObj))
+        .catch(reject);
     });
   }
 
@@ -289,15 +278,12 @@ export class ParseMobx {
    * @param options
    * @returns {Promise<ParseMobx>}
    */
-  fetchWithInclude<K extends string>(
-      keys: K | (K | K[])[],
-      options?: Parse.RequestOptions | undefined,
-  ): Promise<this> {
+  fetchWithInclude<K extends string>(keys: K | (K | K[])[], options?: Parse.RequestOptions | undefined): Promise<this> {
     return new Promise((resolve, reject) => {
       this.parseObj
-          .fetchWithInclude(keys, options)
-          .then((newParseObj: Parse.Object) => new ParseMobx(newParseObj))
-          .catch(reject);
+        .fetchWithInclude(keys, options)
+        .then((newParseObj: Parse.Object) => new ParseMobx(newParseObj))
+        .catch(reject);
     });
   }
 
@@ -435,9 +421,7 @@ export class ParseMobx {
    *
    * @returns {*|Parse.Relation}
    */
-  relation<R extends Parse.Object<Parse.Attributes>, K extends string = string>(
-      attr: K,
-  ): Parse.Relation<any, R> {
+  relation<R extends Parse.Object<Parse.Attributes>, K extends string = string>(attr: K): Parse.Relation<any, R> {
     return this.parseObj.relation(attr);
   }
 
@@ -500,21 +484,20 @@ export class ParseMobx {
     this.loading = true;
     return new Promise((resolve, reject) => {
       this.parseObj
-          .save(options)
-          .then(() => {
-            runInAction(() => {
-              this.loading = false;
-              this.set('updatedAt', new Date().toISOString(), undefined);
-              resolve(this);
-            });
-
-          })
-          .catch((error: any) => {
-            runInAction(() => {
-              this.loading = false;
-              reject(error);
-            });
+        .save(options)
+        .then(() => {
+          runInAction(() => {
+            this.loading = false;
+            this.set('updatedAt', new Date().toISOString(), undefined);
+            resolve(this);
           });
+        })
+        .catch((error: any) => {
+          runInAction(() => {
+            this.loading = false;
+            reject(error);
+          });
+        });
     });
   }
 
@@ -523,27 +506,24 @@ export class ParseMobx {
    * @param options
    */
   @action
-  saveEventually(
-      options?: Parse.Object.SaveOptions | undefined,
-  ): Promise<this> {
+  saveEventually(options?: Parse.Object.SaveOptions | undefined): Promise<this> {
     this.loading = true;
     return new Promise((resolve, reject) => {
       this.parseObj
-          .saveEventually(options)
-          .then(() => {
-            runInAction(() => {
-                  this.loading = false;
-                  this.set('updatedAt', new Date().toISOString(), undefined);
-                  resolve(this);
-                }
-            );
-          })
-          .catch((error: any) => {
-            runInAction(() => {
-              this.loading = false;
-              reject(error);
-            })
+        .saveEventually(options)
+        .then(() => {
+          runInAction(() => {
+            this.loading = false;
+            this.set('updatedAt', new Date().toISOString(), undefined);
+            resolve(this);
           });
+        })
+        .catch((error: any) => {
+          runInAction(() => {
+            this.loading = false;
+            reject(error);
+          });
+        });
     });
   }
 
@@ -582,10 +562,7 @@ export class ParseMobx {
    *
    * @returns {ParseMobx}
    */
-  setACL(
-      acl: Parse.ACL,
-      options?: Parse.SuccessFailureOptions | undefined,
-  ): false | this {
+  setACL(acl: Parse.ACL, options?: Parse.SuccessFailureOptions | undefined): false | this {
     this.parseObj.setACL(acl, options);
     return this;
   }
@@ -639,10 +616,7 @@ export class ParseMobx {
    * @param attrs
    * @returns {*|boolean|_ParseError.default|void|string|ActiveX.IXMLDOMParseError}
    */
-  validate(
-      attrs: Parse.Attributes,
-      options?: Parse.SuccessFailureOptions | undefined,
-  ): false | Parse.Error {
+  validate(attrs: Parse.Attributes, options?: Parse.SuccessFailureOptions | undefined): false | Parse.Error {
     return this.parseObj.validate(attrs, options);
   }
 
