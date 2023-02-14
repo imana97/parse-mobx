@@ -1,8 +1,6 @@
-import Parse from "parse";
-import { action, extendObservable, makeObservable, observable, runInAction } from "mobx";
-import { Attributes, EventCallback } from "./types";
-
-
+import Parse from 'parse';
+import { action, extendObservable, makeObservable, observable, runInAction } from 'mobx';
+import { Attributes, EventCallback } from './types';
 
 /**
  * Parse Mobx Class
@@ -45,8 +43,8 @@ export class ParseMobx {
           el.constructor.name === 'ParseObjectSubclass'
             ? new ParseMobx(el)
             : el.constructor.name !== 'ParseRelation' && el.constructor.name !== 'ParseACL'
-              ? el
-              : null,
+            ? el
+            : null,
         );
       } else if (
         attribute.constructor.name !== 'ParseRelation' &&
@@ -70,10 +68,10 @@ export class ParseMobx {
     return typeof param === 'function'
       ? (obj: Parse.Object) => param(new ParseMobx(obj))
       : Array.isArray(param)
-        ? param.map((obj: Parse.Object) => new ParseMobx(obj))
-        : param
-          ? new ParseMobx(param)
-          : null;
+      ? param.map((obj: Parse.Object) => new ParseMobx(obj))
+      : param
+      ? new ParseMobx(param)
+      : null;
   }
 
   /**
@@ -656,7 +654,6 @@ export class ParseMobx {
  * Mobx Store Class
  */
 export class MobxStore {
-
   @observable objects: ParseMobx[] = [];
   @observable parseError?: Parse.Error;
   @observable loading = false;
@@ -670,9 +667,7 @@ export class MobxStore {
   }
 
   @action
-  fetchObjects(
-    parseQuery: Parse.Query = new Parse.Query(this.parseClassName)
-  ): void {
+  fetchObjects(parseQuery: Parse.Query = new Parse.Query(this.parseClassName)): void {
     (async () => {
       try {
         this.loading = true;
@@ -732,33 +727,21 @@ export class MobxStore {
   }
 
   @action
-  subscribe(
-    parseQuery: Parse.Query = new Parse.Query(this.parseClassName)
-  ): void {
+  subscribe(parseQuery: Parse.Query = new Parse.Query(this.parseClassName)): void {
     (async () => {
       if (this.subscription) return false; // don't listen twice
       this.subscription = await parseQuery.subscribe();
-      this.subscription.on("open", () => {
+      this.subscription.on('open', () => {
         runInAction(() => {
           this.subscriptionOpen = true;
         });
       });
-      this.subscription.on("create", (object: Parse.Object) =>
-        this.createCallback(object)
-      );
-      this.subscription.on("update", (object: Parse.Object) =>
-        this.updateCallback(object)
-      );
-      this.subscription.on("enter", (object: Parse.Object) =>
-        this.enterCallback(object)
-      );
-      this.subscription.on("leave", (object: Parse.Object) =>
-        this.leaveCallback(object)
-      );
-      this.subscription.on("delete", (object: Parse.Object) =>
-        this.deleteCallback(object)
-      );
-      this.subscription.on("close", () => {
+      this.subscription.on('create', (object: Parse.Object) => this.createCallback(object));
+      this.subscription.on('update', (object: Parse.Object) => this.updateCallback(object));
+      this.subscription.on('enter', (object: Parse.Object) => this.enterCallback(object));
+      this.subscription.on('leave', (object: Parse.Object) => this.leaveCallback(object));
+      this.subscription.on('delete', (object: Parse.Object) => this.deleteCallback(object));
+      this.subscription.on('close', () => {
         runInAction(() => {
           this.subscriptionOpen = false;
         });
