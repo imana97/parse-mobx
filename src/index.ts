@@ -1,16 +1,15 @@
-// Import from mobx
-import { action, configure, extendObservable, makeObservable, observable, runInAction } from 'mobx';
-import Parse from 'parse';
+import Parse from "parse";
+import { action, extendObservable, makeObservable, observable, runInAction } from "mobx";
+import { Attributes, EventCallback } from "./types";
 
-// Configure mobx strictMode. so any changes to observable must be in actions.
-configure({ enforceActions: 'observed' });
+
 
 /**
- * Main Class
+ * Parse Mobx Class
  */
-export default class ParseMobx {
-  @observable private readonly attributes: any;
+export class ParseMobx {
   @observable loading = false;
+  @observable private readonly attributes: any;
   private readonly parseObj: any;
   private readonly id: string;
 
@@ -46,8 +45,8 @@ export default class ParseMobx {
           el.constructor.name === 'ParseObjectSubclass'
             ? new ParseMobx(el)
             : el.constructor.name !== 'ParseRelation' && el.constructor.name !== 'ParseACL'
-            ? el
-            : null,
+              ? el
+              : null,
         );
       } else if (
         attribute.constructor.name !== 'ParseRelation' &&
@@ -71,10 +70,10 @@ export default class ParseMobx {
     return typeof param === 'function'
       ? (obj: Parse.Object) => param(new ParseMobx(obj))
       : Array.isArray(param)
-      ? param.map((obj: Parse.Object) => new ParseMobx(obj))
-      : param
-      ? new ParseMobx(param)
-      : null;
+        ? param.map((obj: Parse.Object) => new ParseMobx(obj))
+        : param
+          ? new ParseMobx(param)
+          : null;
   }
 
   /**
@@ -651,4 +650,166 @@ export default class ParseMobx {
   private checkType(key: string, type: string): boolean {
     return this.attributes[key].constructor.name === type;
   }
+}
+
+/**
+ * Mobx Store Class
+ */
+export class MobxStore {
+
+  @observable objects: ParseMobx[] = [];
+  @observable parseError?: Parse.Error;
+  @observable loading = false;
+  @observable subscriptionOpen = false;
+  private readonly parseClassName: string;
+  private subscription?: Parse.LiveQuerySubscription;
+
+  constructor(parseClassName: string) {
+    this.parseClassName = parseClassName;
+    makeObservable(this);
+  }
+
+  @action
+  fetchObjects(
+    parseQuery: Parse.Query = new Parse.Query(this.parseClassName)
+  ): void {
+    (async () => {
+      try {
+        this.loading = true;
+        const objects: Parse.Object[] = await parseQuery.find();
+        runInAction(() => {
+          this.loading = false;
+          this.objects = ParseMobx.toParseMobx(objects);
+        });
+      } catch (error: any) {
+        this.loading = false;
+        this.parseError = error;
+      }
+    })();
+  }
+
+  @action
+  createObject(params: Attributes): void {
+    (async () => {
+      this.loading = true;
+      try {
+        const newObject: Parse.Object = new Parse.Object(this.parseClassName);
+        for (const key in params) {
+          newObject.set(key, params[key]);
+        }
+        await newObject.save();
+        runInAction(() => {
+          this.loading = false;
+          this.objects.push(ParseMobx.toParseMobx(newObject));
+        });
+      } catch (error: any) {
+        this.loading = false;
+        this.parseError = error;
+      }
+    })();
+  }
+
+  @action
+  clearError(): void {
+    this.parseError = undefined;
+  }
+
+  @action
+  deleteObject(obj: ParseMobx): void {
+    (async () => {
+      try {
+        this.loading = true;
+        obj.getParseObject();
+        await obj.destroy();
+        runInAction(() => {
+          this.loading = false;
+          ParseMobx.deleteListItemById(this.objects, obj);
+        });
+      } catch (error: any) {
+        this.parseError = error;
+      }
+    })();
+  }
+
+  @action
+  subscribe(
+    parseQuery: Parse.Query = new Parse.Query(this.parseClassName)
+  ): void {
+    (async () => {
+      if (this.subscription) return false; // don't listen twice
+      this.subscription = await parseQuery.subscribe();
+      this.subscription.on("open", () => {
+        runInAction(() => {
+          this.subscriptionOpen = true;
+        });
+      });
+      this.subscription.on("create", (object: Parse.Object) =>
+        this.createCallback(object)
+      );
+      this.subscription.on("update", (object: Parse.Object) =>
+        this.updateCallback(object)
+      );
+      this.subscription.on("enter", (object: Parse.Object) =>
+        this.enterCallback(object)
+      );
+      this.subscription.on("leave", (object: Parse.Object) =>
+        this.leaveCallback(object)
+      );
+      this.subscription.on("delete", (object: Parse.Object) =>
+        this.deleteCallback(object)
+      );
+      this.subscription.on("close", () => {
+        runInAction(() => {
+          this.subscriptionOpen = false;
+        });
+      });
+    })();
+  }
+
+  onCreate(callback: EventCallback) {
+    this.createCallback = callback;
+  }
+
+  onUpdate(callback: EventCallback) {
+    this.updateCallback = callback;
+  }
+
+  onEnter(callback: EventCallback) {
+    this.enterCallback = callback;
+  }
+
+  onLeave(callback: EventCallback) {
+    this.leaveCallback = callback;
+  }
+
+  onDelete(callback: EventCallback) {
+    this.deleteCallback = callback;
+  }
+
+  unsubscribe() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+      this.subscription = undefined;
+    }
+  }
+
+  private createCallback: EventCallback = (object: Parse.Object) => {
+    return object;
+  };
+
+  private updateCallback: EventCallback = (object: Parse.Object) => {
+    return object;
+  };
+
+  private enterCallback: EventCallback = (object: Parse.Object) => {
+    return object;
+  };
+
+  private leaveCallback: EventCallback = (object: Parse.Object) => {
+    return object;
+  };
+
+  private deleteCallback: EventCallback = (object: Parse.Object) => {
+    return object;
+  };
 }
