@@ -6,6 +6,8 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "build": "tsc",
+    "gen-doc": "npx typedoc src/index.ts",
+    "serve-doc": "npx http-server docs/",
     "format": "prettier --write \"src/**/*.(js|ts)\"",
     "lint": "eslint src --ext .js,.ts",
     "lint:fix": "eslint src --fix --ext .js,.ts",
@@ -48,6 +50,7 @@
     "jest": "29.3.1",
     "prettier": "2.8.1",
     "ts-jest": "29.0.3",
+    "typedoc": "^0.23.25",
     "typescript": "4.9.4"
   },
   "files": [
