@@ -2,7 +2,7 @@ import { ParseMobx } from './index';
 
 export type EventCallback = (someArg: ParseMobx) => any;
 export type Attributes = {
-  [key: string]: never;
+  [key: string]: any;
 };
 export type CreateObjectOptions = {
   updateList?: boolean;
