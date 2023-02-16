@@ -1,6 +1,6 @@
 {
   "name": "parse-mobx",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "A wrapper for ParseJS SDK to make Parse Objects observable in Mobx",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
