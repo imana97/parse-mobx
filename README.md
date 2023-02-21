@@ -29,7 +29,7 @@
 
 # Getting started
 
-##API Docs 
+## API Docs 
 
 https://imana97.github.io/parse-mobx/
 
