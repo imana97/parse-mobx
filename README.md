@@ -20,14 +20,18 @@
     </a>
     <br />
     <br />
-  <a href="https://github.com/hebertcisco/ts-npm-package-boilerplate/issues/new/choose">Report Bug</a>
-  <a href="https://github.com/hebertcisco/ts-npm-package-boilerplate/issues/new/choose">Request Feature</a>
+  <a href="https://github.com/imana97/parse-mobx/issues/new/choose">Report Bug</a>
+  <a href="https://github.com/imana97/parse-mobx/issues/new/choose">Request Feature</a>
   </p>
  
 <p align="center">Did you like the project? Please, considerate <a href="https://www.buymeacoffee.com/imana97">a donation</a> to help improve!</p>
 
 
 # Getting started
+
+## API Docs 
+
+https://imana97.github.io/parse-mobx/
 
 ## Installation
 
