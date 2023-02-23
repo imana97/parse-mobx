@@ -1,6 +1,6 @@
-import Parse from "parse";
-import { action, extendObservable, makeObservable, observable, runInAction } from "mobx";
-import { Attributes, CreateObjectOptions, DeleteObjectOptions, EventCallback } from "./types";
+import Parse from 'parse';
+import { action, extendObservable, makeObservable, observable, runInAction } from 'mobx';
+import { Attributes, CreateObjectOptions, DeleteObjectOptions, EventCallback } from './types';
 
 /**
  * Parse Mobx Class
@@ -50,7 +50,7 @@ export class ParseMobx {
 
     // copy id
     this.id = obj.id;
-    this.attributes = { createdAt: obj.get("createdAt") };
+    this.attributes = { createdAt: obj.get('createdAt') };
 
     // store props to be observed.
     const observableObject: Parse.Attributes = {};
@@ -58,20 +58,20 @@ export class ParseMobx {
     for (const key in obj.attributes) {
       const attribute = obj.attributes[key];
 
-      if (attribute.constructor.name === "ParseObjectSubclass") {
+      if (attribute.constructor.name === 'ParseObjectSubclass') {
         this.attributes[key] = new ParseMobx(attribute);
       } else if (Array.isArray(attribute)) {
         observableObject[key] = attribute.map((el) =>
-          el.constructor.name === "ParseObjectSubclass"
+          el.constructor.name === 'ParseObjectSubclass'
             ? new ParseMobx(el)
-            : el.constructor.name !== "ParseRelation" && el.constructor.name !== "ParseACL"
-              ? el
-              : null
+            : el.constructor.name !== 'ParseRelation' && el.constructor.name !== 'ParseACL'
+            ? el
+            : null,
         );
       } else if (
-        attribute.constructor.name !== "ParseRelation" &&
-        attribute.constructor.name !== "ParseACL" &&
-        key !== "createdAt"
+        attribute.constructor.name !== 'ParseRelation' &&
+        attribute.constructor.name !== 'ParseACL' &&
+        key !== 'createdAt'
       ) {
         observableObject[key] = attribute;
       }
@@ -87,15 +87,15 @@ export class ParseMobx {
    * @returns {ParseMobx | ParseMobx[] | ((obj: Parse.Object) => any) | null}
    */
   static toParseMobx(param: any): ParseMobx | ParseMobx[] | ((obj: Parse.Object) => any) | null {
-    return typeof param === "function"
+    return typeof param === 'function'
       ? (obj: Parse.Object) => param(new ParseMobx(obj))
       : Array.isArray(param)
-        ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
+      ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         param.map((obj: Parse.Object) => new ParseMobx(obj))
-        : param
-          ? new ParseMobx(param)
-          : null;
+      : param
+      ? new ParseMobx(param)
+      : null;
   }
 
   /**
@@ -107,7 +107,7 @@ export class ParseMobx {
   static deleteListItemById(list: ParseMobx[], item: ParseMobx): void {
     list.splice(
       list.findIndex((obj: ParseMobx) => obj.getId() === item.getId()),
-      1
+      1,
     );
   }
 
@@ -160,10 +160,10 @@ export class ParseMobx {
   @action
   addAllUnique(attr: string, items: any[]): this {
     this.checkDefined(attr, []);
-    if (this.checkType(attr, "Array")) {
+    if (this.checkType(attr, 'Array')) {
       items.forEach((item) => {
         if (this.attributes[attr].indexOf(item) === -1) {
-          item.constructor.name === "ParseObjectSubclass"
+          item.constructor.name === 'ParseObjectSubclass'
             ? this.attributes[attr].push(new ParseMobx(item))
             : this.attributes[attr].push(item);
         }
@@ -183,9 +183,9 @@ export class ParseMobx {
   @action
   addUnique(key: string, value: any) {
     this.checkDefined(key, []);
-    if (this.checkType(key, "Array")) {
+    if (this.checkType(key, 'Array')) {
       if (this.attributes[key].indexOf(value) === -1) {
-        value.constructor.name === "ParseObjectSubclass"
+        value.constructor.name === 'ParseObjectSubclass'
           ? this.attributes[key].push(new ParseMobx(value))
           : this.attributes[key].push(value);
       }
@@ -362,7 +362,7 @@ export class ParseMobx {
   increment(attr: string, amount?: number | undefined): false | this {
     // set 0 to attr if undefined.
     this.checkDefined(attr, 0);
-    if (this.checkType(attr, "Number")) {
+    if (this.checkType(attr, 'Number')) {
       this.attributes[attr] += amount || 0;
     }
     this.parseObj.increment(attr, amount);
@@ -377,7 +377,7 @@ export class ParseMobx {
    */
   decrement(attr: string, amount?: number | undefined): false | this {
     this.checkDefined(attr, 0);
-    if (this.checkType(attr, "Number")) {
+    if (this.checkType(attr, 'Number')) {
       this.attributes[attr] -= amount || 0;
     }
     this.parseObj.decrement(attr, amount);
@@ -396,7 +396,7 @@ export class ParseMobx {
    * @returns {boolean}
    */
   isDataAvailable(): boolean {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   /**
@@ -476,7 +476,7 @@ export class ParseMobx {
   remove(key: string, value: any) {
     this.checkDefined(key, []);
 
-    if (this.checkType(key, "Array")) {
+    if (this.checkType(key, 'Array')) {
       if (this.attributes[key].indexOf(value) !== -1) {
         this.attributes[key].splice(this.attributes[key].indexOf(value), 1);
       }
@@ -495,7 +495,7 @@ export class ParseMobx {
   removeAll(attr: string, items: any[]) {
     this.checkDefined(attr, []);
 
-    if (this.checkType(attr, "Array")) {
+    if (this.checkType(attr, 'Array')) {
       items.forEach((item) => {
         if (this.attributes[attr].indexOf(item) !== -1) {
           this.attributes[attr].splice(this.attributes[attr].indexOf(item), 1);
@@ -534,7 +534,7 @@ export class ParseMobx {
         .then(() => {
           runInAction(() => {
             this.loading = false;
-            this.set("updatedAt", new Date().toISOString(), undefined);
+            this.set('updatedAt', new Date().toISOString(), undefined);
             resolve(this);
           });
         })
@@ -561,7 +561,7 @@ export class ParseMobx {
         .then(() => {
           runInAction(() => {
             this.loading = false;
-            this.set("updatedAt", new Date().toISOString(), undefined);
+            this.set('updatedAt', new Date().toISOString(), undefined);
             resolve(this);
           });
         })
@@ -583,15 +583,15 @@ export class ParseMobx {
    */
   @action
   set(key: string, value: any, options?: Parse.Object.SetOptions): this {
-    if (value.constructor.name === "ParseRelation") {
-      throw new Error("You can not add relations with set");
+    if (value.constructor.name === 'ParseRelation') {
+      throw new Error('You can not add relations with set');
     }
-    if (value.constructor.name === "ParseACL") {
-      throw new Error("Please use setACL() instead");
+    if (value.constructor.name === 'ParseACL') {
+      throw new Error('Please use setACL() instead');
     }
-    if (typeof this.attributes[key] !== "undefined") {
+    if (typeof this.attributes[key] !== 'undefined') {
       // if it is parse subclass, create parse object.
-      if (value.constructor.name === "ParseObjectSubclass") {
+      if (value.constructor.name === 'ParseObjectSubclass') {
         this.attributes[key] = new ParseMobx(value);
       } else {
         this.attributes[key] = value;
@@ -689,7 +689,7 @@ export class ParseMobx {
    * @private
    */
   private checkDefined(key: string, initValue: any): void {
-    if (typeof this.attributes[key] === "undefined") {
+    if (typeof this.attributes[key] === 'undefined') {
       const objToExtend: any = {};
       objToExtend[key] = initValue;
       extendObservable(this.attributes, objToExtend);
@@ -848,18 +848,18 @@ export class MobxStore {
     (async () => {
       if (this.subscription) return false; // don't listen twice
       this.subscription = await parseQuery.subscribe();
-      this.subscription.on("open", () => {
+      this.subscription.on('open', () => {
         runInAction(() => {
           this.subscriptionOpen = true;
         });
       });
 
-      this.subscription.on("create", (object: Parse.Object) => this.createCallback(new ParseMobx(object)));
-      this.subscription.on("update", (object: Parse.Object) => this.updateCallback(new ParseMobx(object)));
-      this.subscription.on("enter", (object: Parse.Object) => this.enterCallback(new ParseMobx(object)));
-      this.subscription.on("leave", (object: Parse.Object) => this.leaveCallback(new ParseMobx(object)));
-      this.subscription.on("delete", (object: Parse.Object) => this.deleteCallback(new ParseMobx(object)));
-      this.subscription.on("close", () => {
+      this.subscription.on('create', (object: Parse.Object) => this.createCallback(new ParseMobx(object)));
+      this.subscription.on('update', (object: Parse.Object) => this.updateCallback(new ParseMobx(object)));
+      this.subscription.on('enter', (object: Parse.Object) => this.enterCallback(new ParseMobx(object)));
+      this.subscription.on('leave', (object: Parse.Object) => this.leaveCallback(new ParseMobx(object)));
+      this.subscription.on('delete', (object: Parse.Object) => this.deleteCallback(new ParseMobx(object)));
+      this.subscription.on('close', () => {
         runInAction(() => {
           this.subscriptionOpen = false;
         });
