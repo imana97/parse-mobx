@@ -1,6 +1,6 @@
 import { makeObservable, observable, action, runInAction } from 'mobx';
 import Parse from 'parse';
-import { ParseMobx } from '../../../lib'; // parse mobx
+import { ParseMobx } from '../../../lib';
 
 
 class TodoStore {
@@ -13,6 +13,26 @@ class TodoStore {
   @observable todos: ParseMobx[] = [];
   @observable loading: boolean = false;
   @observable error: string = '';
+
+  @action
+  async getTodos() {
+    this.loading = true;
+    try {
+      const query = new Parse.Query('Todo');
+      const results = await query.find();
+      runInAction(() => {
+        this.todos = results.map((item) => new ParseMobx(item));
+      });
+    } catch (error: any) {
+      runInAction(() => {
+        this.error = error.message;
+      });
+    } finally {
+      runInAction(() => {
+        this.loading = false;
+      });
+    }
+  }
 
   @action
   async newItem(value: string): Promise<void> {
@@ -38,6 +58,26 @@ class TodoStore {
     }
 
   }
+
+  @action
+  async deleteItem(itemId: string): Promise<void> {
+    const itemToDelete = this.todos.find((item) => item.getId() === itemId);
+    if (itemToDelete) {
+      await itemToDelete.destroy();
+      runInAction(() => {
+        this.todos = this.todos.filter((item) => item !== itemToDelete);
+      });
+    }
+  }
+
+  @action
+  async updateItem(itemId: string, updatedTodo:string): Promise<void> {
+    const itemToUpdate = this.todos.find((item) => item.getId() === itemId);
+    if (itemToUpdate) {
+      await itemToUpdate.set('todo', updatedTodo).save();
+    }
+  }
+
 }
 
 const todoStore: TodoStore = new TodoStore();
