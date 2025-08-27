@@ -65,8 +65,8 @@ export class ParseMobx {
           el.constructor.name === 'ParseObjectSubclass'
             ? new ParseMobx(el)
             : el.constructor.name !== 'ParseRelation' && el.constructor.name !== 'ParseACL'
-            ? el
-            : null,
+              ? el
+              : null,
         );
       } else if (
         attribute.constructor.name !== 'ParseRelation' &&
@@ -90,12 +90,12 @@ export class ParseMobx {
     return typeof param === 'function'
       ? (obj: Parse.Object) => param(new ParseMobx(obj))
       : Array.isArray(param)
-      ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        param.map((obj: Parse.Object) => new ParseMobx(obj))
-      : param
-      ? new ParseMobx(param)
-      : null;
+        ? // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          param.map((obj: Parse.Object) => new ParseMobx(obj))
+        : param
+          ? new ParseMobx(param)
+          : null;
   }
 
   /**
@@ -290,7 +290,7 @@ export class ParseMobx {
     return new Promise((resolve, reject) => {
       this.parseObj
         .fetch(options)
-        .then((newParseObj: Parse.Object) => new ParseMobx(newParseObj))
+        .then((newParseObj: Parse.Object) => resolve(new ParseMobx(newParseObj) as this))
         .catch(reject);
     });
   }
@@ -313,7 +313,7 @@ export class ParseMobx {
     return new Promise((resolve, reject) => {
       this.parseObj
         .fetchWithInclude(keys, options)
-        .then((newParseObj: Parse.Object) => new ParseMobx(newParseObj))
+        .then((newParseObj: Parse.Object) => resolve(new ParseMobx(newParseObj) as this))
         .catch(reject);
     });
   }
@@ -396,7 +396,7 @@ export class ParseMobx {
    * @returns {boolean}
    */
   isDataAvailable(): boolean {
-    throw new Error('Method not implemented.');
+    return this.parseObj.isDataAvailable();
   }
 
   /**
@@ -634,6 +634,19 @@ export class ParseMobx {
   }
 
   /**
+   * Creates an offline pointer to this object
+   * @returns {Parse.Pointer}
+   */
+  toOfflinePointer(): Parse.Pointer {
+    const parseObjAny = this.parseObj as any;
+    if (parseObjAny.toOfflinePointer) {
+      return parseObjAny.toOfflinePointer();
+    }
+    // Fallback to regular pointer if offline pointer is not available
+    return this.parseObj.toPointer();
+  }
+
+  /**
    *
    * @returns {Promise<void>}
    */
@@ -680,6 +693,40 @@ export class ParseMobx {
    */
   getParseObject(): Parse.Object {
     return this.parseObj;
+  }
+
+  /**
+   * Clear pending operations on the Parse object
+   */
+  _clearPendingOps(): void {
+    const parseObjAny = this.parseObj as any;
+    if (parseObjAny._clearPendingOps) {
+      return parseObjAny._clearPendingOps();
+    }
+  }
+
+  /**
+   * Get the internal Parse object ID
+   * @returns {string}
+   */
+  _getId(): string {
+    const parseObjAny = this.parseObj as any;
+    if (parseObjAny._getId) {
+      return parseObjAny._getId();
+    }
+    return this.parseObj.id || '';
+  }
+
+  /**
+   * Get the internal state identifier
+   * @returns {any}
+   */
+  _getStateIdentifier(): any {
+    const parseObjAny = this.parseObj as any;
+    if (parseObjAny._getStateIdentifier) {
+      return parseObjAny._getStateIdentifier();
+    }
+    return null;
   }
 
   /**
@@ -764,11 +811,12 @@ export class MobxStore {
    * @param {Parse.Query} parseQuery
    */
   @action
-  fetchObjects(parseQuery: Parse.Query = new Parse.Query(this.parseClassName)): void {
+  fetchObjects(parseQuery?: Parse.Query): void {
     (async () => {
       try {
         this.loading = true;
-        const objects: Parse.Object[] = await parseQuery.find();
+        const query = parseQuery || new Parse.Query(this.parseClassName);
+        const objects = await query.find();
         runInAction(() => {
           this.loading = false;
           this.objects = ParseMobx.toParseMobx(objects) as any;
@@ -790,7 +838,7 @@ export class MobxStore {
     (async () => {
       this.loading = true;
       try {
-        const newObject: Parse.Object = new Parse.Object(this.parseClassName);
+        const newObject = new Parse.Object(this.parseClassName);
         for (const key in params) {
           newObject.set(key, params[key]);
         }
@@ -844,26 +892,30 @@ export class MobxStore {
    * @param {Parse.Query} parseQuery
    */
   @action
-  subscribe(parseQuery: Parse.Query = new Parse.Query(this.parseClassName)): void {
+  subscribe(parseQuery?: Parse.Query): void {
     (async () => {
       if (this.subscription) return false; // don't listen twice
-      this.subscription = await parseQuery.subscribe();
-      this.subscription.on('open', () => {
-        runInAction(() => {
-          this.subscriptionOpen = true;
-        });
-      });
+      const query = parseQuery || new Parse.Query(this.parseClassName);
+      this.subscription = (await query.subscribe()) as any;
 
-      this.subscription.on('create', (object: Parse.Object) => this.createCallback(new ParseMobx(object)));
-      this.subscription.on('update', (object: Parse.Object) => this.updateCallback(new ParseMobx(object)));
-      this.subscription.on('enter', (object: Parse.Object) => this.enterCallback(new ParseMobx(object)));
-      this.subscription.on('leave', (object: Parse.Object) => this.leaveCallback(new ParseMobx(object)));
-      this.subscription.on('delete', (object: Parse.Object) => this.deleteCallback(new ParseMobx(object)));
-      this.subscription.on('close', () => {
-        runInAction(() => {
-          this.subscriptionOpen = false;
+      if (this.subscription) {
+        this.subscription.on('open', () => {
+          runInAction(() => {
+            this.subscriptionOpen = true;
+          });
         });
-      });
+
+        this.subscription.on('create', (object: Parse.Object) => this.createCallback(new ParseMobx(object)));
+        this.subscription.on('update', (object: Parse.Object) => this.updateCallback(new ParseMobx(object)));
+        this.subscription.on('enter', (object: Parse.Object) => this.enterCallback(new ParseMobx(object)));
+        this.subscription.on('leave', (object: Parse.Object) => this.leaveCallback(new ParseMobx(object)));
+        this.subscription.on('delete', (object: Parse.Object) => this.deleteCallback(new ParseMobx(object)));
+        this.subscription.on('close', () => {
+          runInAction(() => {
+            this.subscriptionOpen = false;
+          });
+        });
+      }
     })();
   }
 
