@@ -1,4 +1,4 @@
-import Parse from 'parse';
+import Parse from './parse-import';
 import { action, extendObservable, makeObservable, observable, runInAction } from 'mobx';
 import { Attributes, CreateObjectOptions, DeleteObjectOptions, EventCallback } from './types';
 
