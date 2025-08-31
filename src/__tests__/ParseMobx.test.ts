@@ -1,4 +1,4 @@
-import { ParseMobx } from '../index';
+import { ParseMobx, configureParseMobx } from '../index';
 import { configure } from 'mobx';
 
 // Mock Parse SDK
@@ -67,6 +67,16 @@ const mockParseObject: any = {
   toOfflinePointer: jest.fn(() => ({ __type: 'Pointer', className: 'TestObject', objectId: mockParseObject.id })),
 };
 
+// Mock Parse SDK
+const mockParse = {
+  Object: jest.fn().mockImplementation(() => mockParseObject),
+  Query: jest.fn(),
+  Error: jest.fn(),
+};
+
+// Mock Parse module
+jest.mock('parse', () => mockParse);
+
 // Configure MobX for testing
 configure({ enforceActions: 'never' });
 
@@ -75,6 +85,8 @@ describe('ParseMobx', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Configure ParseMobx with mock Parse instance
+    configureParseMobx(mockParse);
     parseMobx = new ParseMobx(mockParseObject as any);
   });
 

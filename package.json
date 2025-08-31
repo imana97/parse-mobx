@@ -4,6 +4,16 @@
   "description": "A wrapper for ParseJS SDK to make Parse Objects observable in Mobx",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./react-native": {
+      "types": "./lib/react-native.d.ts",
+      "default": "./lib/react-native.js"
+    }
+  },
   "scripts": {
     "build": "tsc",
     "gen-doc": "npx typedoc src/index.ts",

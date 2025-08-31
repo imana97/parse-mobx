@@ -1,4 +1,4 @@
-import { MobxStore, ParseMobx } from '../index';
+import { MobxStore, ParseMobx, configureParseMobx } from '../index';
 import { configure } from 'mobx';
 
 // Mock Parse SDK
@@ -33,12 +33,15 @@ const mockQuery = {
   ),
 };
 
-// Mock Parse module
-jest.mock('parse', () => ({
+// Mock Parse SDK
+const mockParse = {
   Object: jest.fn().mockImplementation(() => mockParseObject),
   Query: jest.fn().mockImplementation(() => mockQuery),
   Error: jest.fn(),
-}));
+};
+
+// Mock Parse module
+jest.mock('parse', () => mockParse);
 
 // Configure MobX for testing
 configure({ enforceActions: 'never' });
@@ -48,6 +51,8 @@ describe('MobxStore', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Configure ParseMobx with mock Parse instance
+    configureParseMobx(mockParse);
     store = new MobxStore('TestObject');
   });
 

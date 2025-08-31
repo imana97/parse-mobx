@@ -1,6 +1,10 @@
-import Parse from './parse-import';
 import { action, extendObservable, makeObservable, observable, runInAction } from 'mobx';
 import { Attributes, CreateObjectOptions, DeleteObjectOptions, EventCallback } from './types';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { configureParseMobx, getParseInstance } from './config';
+
+// Re-export configuration function
+export { configureParseMobx } from './config';
 
 /**
  * Parse Mobx Class
@@ -815,6 +819,7 @@ export class MobxStore {
     (async () => {
       try {
         this.loading = true;
+        const Parse = getParseInstance();
         const query = parseQuery || new Parse.Query(this.parseClassName);
         const objects = await query.find();
         runInAction(() => {
@@ -838,6 +843,7 @@ export class MobxStore {
     (async () => {
       this.loading = true;
       try {
+        const Parse = getParseInstance();
         const newObject = new Parse.Object(this.parseClassName);
         for (const key in params) {
           newObject.set(key, params[key]);
