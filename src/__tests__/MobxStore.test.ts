@@ -25,10 +25,12 @@ const mockParseObject: any = {
 const mockQuery = {
   find: jest.fn(() => Promise.resolve([mockParseObject])),
   first: jest.fn(() => Promise.resolve(mockParseObject)),
-  subscribe: jest.fn(() => Promise.resolve({
-    on: jest.fn(),
-    unsubscribe: jest.fn(),
-  })),
+  subscribe: jest.fn(() =>
+    Promise.resolve({
+      on: jest.fn(),
+      unsubscribe: jest.fn(),
+    }),
+  ),
 };
 
 // Mock Parse module
@@ -61,14 +63,14 @@ describe('MobxStore', () => {
   describe('fetchObjects', () => {
     test('should load objects from Parse and update state', async () => {
       expect(store.loading).toBe(false);
-      
+
       // Trigger async operation
       store.fetchObjects();
       expect(store.loading).toBe(true);
-      
+
       // Wait for async operation to complete
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       expect(store.loading).toBe(false);
       expect(store.objects.length).toBeGreaterThan(0);
       expect(mockQuery.find).toHaveBeenCalled();
@@ -77,24 +79,24 @@ describe('MobxStore', () => {
     test('should handle errors during fetch', async () => {
       const error = new Error('Fetch failed');
       mockQuery.find.mockRejectedValueOnce(error);
-      
+
       store.fetchObjects();
-      
+
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       expect(store.loading).toBe(false);
       expect(store.parseError).toBe(error);
     });
 
     test('should accept custom query', async () => {
       const customQuery = mockQuery;
-      
+
       store.fetchObjects(customQuery as any);
-      
+
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       expect(customQuery.find).toHaveBeenCalled();
     });
   });
@@ -102,37 +104,37 @@ describe('MobxStore', () => {
   describe('createObject', () => {
     test('should create new object and update list', async () => {
       const params = { title: 'New Todo', completed: false };
-      
+
       store.createObject(params, { updateList: true });
-      
+
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       expect(store.loading).toBe(false);
       expect(mockParseObject.save).toHaveBeenCalled();
     });
 
     test('should use saveEventually when specified', async () => {
       const params = { title: 'New Todo', completed: false };
-      
+
       store.createObject(params, { saveEventually: true, updateList: true });
-      
+
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       expect(mockParseObject.saveEventually).toHaveBeenCalled();
     });
 
     test('should handle creation errors', async () => {
       const error = new Error('Creation failed');
       mockParseObject.save.mockRejectedValueOnce(error);
-      
+
       const params = { title: 'New Todo', completed: false };
       store.createObject(params);
-      
+
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       expect(store.loading).toBe(false);
       expect(store.parseError).toBe(error);
     });
@@ -141,41 +143,41 @@ describe('MobxStore', () => {
   describe('deleteObject', () => {
     test('should delete object and remove from list', async () => {
       const parseMobxObj = new ParseMobx(mockParseObject as any);
-      
+
       // Add object to list first
       store.objects.push(parseMobxObj);
       expect(store.objects.length).toBe(1);
-      
+
       store.deleteObject(parseMobxObj);
-      
+
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       expect(mockParseObject.destroy).toHaveBeenCalled();
       expect(store.objects.length).toBe(0);
     });
 
     test('should use destroyEventually when specified', async () => {
       const parseMobxObj = new ParseMobx(mockParseObject as any);
-      
+
       store.deleteObject(parseMobxObj, { deleteEventually: true });
-      
+
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       expect(mockParseObject.destroyEventually).toHaveBeenCalled();
     });
 
     test('should handle deletion errors', async () => {
       const error = new Error('Deletion failed');
       mockParseObject.destroy.mockRejectedValueOnce(error);
-      
+
       const parseMobxObj = new ParseMobx(mockParseObject as any);
       store.deleteObject(parseMobxObj);
-      
+
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       expect(store.parseError).toBe(error);
     });
   });
@@ -184,9 +186,9 @@ describe('MobxStore', () => {
     test('clearError should clear parse error', () => {
       store.parseError = new Error('Test error') as any;
       expect(store.parseError).toBeDefined();
-      
+
       store.clearError();
-      
+
       expect(store.parseError).toBeUndefined();
     });
   });
@@ -194,40 +196,40 @@ describe('MobxStore', () => {
   describe('LiveQuery Subscription', () => {
     test('should setup LiveQuery subscription', async () => {
       store.subscribe();
-      
+
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       expect(mockQuery.subscribe).toHaveBeenCalled();
     });
 
     test('should not subscribe twice', async () => {
       const mockSubscription = { unsubscribe: jest.fn() };
       (store as any).subscription = mockSubscription;
-      
+
       store.subscribe();
-      
+
       // Should return early without calling subscribe
       expect(mockQuery.subscribe).not.toHaveBeenCalled();
     });
 
     test('should accept custom query for subscription', async () => {
       const customQuery = { ...mockQuery };
-      
+
       store.subscribe(customQuery as any);
-      
+
       // Wait for async operation
-      await new Promise(resolve => setTimeout(resolve, 10));
-      
+      await new Promise((resolve) => setTimeout(resolve, 10));
+
       expect(customQuery.subscribe).toHaveBeenCalled();
     });
 
     test('unsubscribe should cleanup subscription', () => {
       const mockSubscription = { unsubscribe: jest.fn() };
       (store as any).subscription = mockSubscription;
-      
+
       store.unsubscribe();
-      
+
       expect(mockSubscription.unsubscribe).toHaveBeenCalled();
       expect((store as any).subscription).toBeUndefined();
     });
@@ -240,53 +242,53 @@ describe('MobxStore', () => {
   describe('Event Callbacks', () => {
     test('onCreate should set create callback', () => {
       const createCallback = jest.fn();
-      
+
       store.onCreate(createCallback);
-      
+
       expect((store as any).createCallback).toBe(createCallback);
     });
 
     test('onUpdate should set update callback', () => {
       const updateCallback = jest.fn();
-      
+
       store.onUpdate(updateCallback);
-      
+
       expect((store as any).updateCallback).toBe(updateCallback);
     });
 
     test('onEnter should set enter callback', () => {
       const enterCallback = jest.fn();
-      
+
       store.onEnter(enterCallback);
-      
+
       expect((store as any).enterCallback).toBe(enterCallback);
     });
 
     test('onLeave should set leave callback', () => {
       const leaveCallback = jest.fn();
-      
+
       store.onLeave(leaveCallback);
-      
+
       expect((store as any).leaveCallback).toBe(leaveCallback);
     });
 
     test('onDelete should set delete callback', () => {
       const deleteCallback = jest.fn();
-      
+
       store.onDelete(deleteCallback);
-      
+
       expect((store as any).deleteCallback).toBe(deleteCallback);
     });
 
     test('default callbacks should return the object', () => {
       const parseMobxObj = new ParseMobx(mockParseObject as any);
-      
+
       const createResult = (store as any).createCallback(parseMobxObj);
       const updateResult = (store as any).updateCallback(parseMobxObj);
       const enterResult = (store as any).enterCallback(parseMobxObj);
       const leaveResult = (store as any).leaveCallback(parseMobxObj);
       const deleteResult = (store as any).deleteCallback(parseMobxObj);
-      
+
       expect(createResult).toBe(parseMobxObj);
       expect(updateResult).toBe(parseMobxObj);
       expect(enterResult).toBe(parseMobxObj);
@@ -313,10 +315,10 @@ describe('MobxStore', () => {
 
     test('parseError should be observable', () => {
       expect(store.parseError).toBeUndefined();
-      
+
       const error = new Error('Test error');
       store.parseError = error as any;
-      
+
       expect(store.parseError).toBe(error);
     });
   });

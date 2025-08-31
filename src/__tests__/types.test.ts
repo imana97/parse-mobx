@@ -13,14 +13,14 @@ describe('Type Definitions', () => {
         save: jest.fn(),
         destroy: jest.fn(),
       };
-      
+
       const parseMobx = new ParseMobx(mockParseObject as any);
-      
+
       const callback: EventCallback = (obj: ParseMobx) => {
         expect(obj).toBeInstanceOf(ParseMobx);
         return obj;
       };
-      
+
       const result = callback(parseMobx);
       expect(result).toBe(parseMobx);
     });
@@ -36,7 +36,7 @@ describe('Type Definitions', () => {
         metadata: { key: 'value' },
         date: new Date(),
       };
-      
+
       expect(attributes.title).toBe('string value');
       expect(attributes.count).toBe(42);
       expect(attributes.active).toBe(true);
@@ -52,16 +52,16 @@ describe('Type Definitions', () => {
       const options2: CreateObjectOptions = { updateList: true };
       const options3: CreateObjectOptions = { saveEventually: true };
       const options4: CreateObjectOptions = { updateList: false, saveEventually: true };
-      
+
       expect(options1.updateList).toBeUndefined();
       expect(options1.saveEventually).toBeUndefined();
-      
+
       expect(options2.updateList).toBe(true);
       expect(options2.saveEventually).toBeUndefined();
-      
+
       expect(options3.updateList).toBeUndefined();
       expect(options3.saveEventually).toBe(true);
-      
+
       expect(options4.updateList).toBe(false);
       expect(options4.saveEventually).toBe(true);
     });
@@ -72,7 +72,7 @@ describe('Type Definitions', () => {
       const options1: DeleteObjectOptions = {};
       const options2: DeleteObjectOptions = { deleteEventually: true };
       const options3: DeleteObjectOptions = { deleteEventually: false };
-      
+
       expect(options1.deleteEventually).toBeUndefined();
       expect(options2.deleteEventually).toBe(true);
       expect(options3.deleteEventually).toBe(false);

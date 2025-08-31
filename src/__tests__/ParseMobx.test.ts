@@ -87,7 +87,9 @@ describe('ParseMobx', () => {
 
     test('should throw error for new Parse objects', () => {
       const newMockObject = { ...mockParseObject, isNew: jest.fn(() => true) };
-      expect(() => new ParseMobx(newMockObject as any)).toThrow('Only Saved Parse objects can be converted to ParseMobx objects');
+      expect(() => new ParseMobx(newMockObject as any)).toThrow(
+        'Only Saved Parse objects can be converted to ParseMobx objects',
+      );
     });
 
     test('should make attributes observable', () => {
@@ -206,10 +208,10 @@ describe('ParseMobx', () => {
   describe('Persistence Methods', () => {
     test('save should save object and update loading state', async () => {
       expect(parseMobx.loading).toBe(false);
-      
+
       const savePromise = parseMobx.save();
       expect(parseMobx.loading).toBe(true);
-      
+
       await savePromise;
       expect(mockParseObject.save).toHaveBeenCalled();
       expect(parseMobx.loading).toBe(false);
@@ -233,7 +235,7 @@ describe('ParseMobx', () => {
     test('fetch should fetch latest data', async () => {
       // Mock the fetch to return a promise that resolves
       mockParseObject.fetch.mockResolvedValueOnce(mockParseObject);
-      
+
       const result = await parseMobx.fetch();
       expect(mockParseObject.fetch).toHaveBeenCalled();
       expect(result).toBeInstanceOf(ParseMobx);
@@ -242,7 +244,7 @@ describe('ParseMobx', () => {
     test('fetchWithInclude should fetch with include', async () => {
       // Mock the fetchWithInclude to return a promise that resolves
       mockParseObject.fetchWithInclude.mockResolvedValueOnce(mockParseObject);
-      
+
       const result = await parseMobx.fetchWithInclude('user');
       expect(mockParseObject.fetchWithInclude).toHaveBeenCalledWith('user', undefined);
       expect(result).toBeInstanceOf(ParseMobx);

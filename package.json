@@ -16,7 +16,10 @@
     "prepublishOnly": "npm run lint",
     "preversion": "npm run lint",
     "version": "npm run format && git add -A src",
-    "postversion": "git push && git push --tags"
+    "postversion": "git push && git push --tags",
+    "bump:minor": "npm version minor",
+    "bump:major": "npm version major",
+    "tag:create": "git tag v$(node -p \"require('./package.json').version\")"
   },
   "repository": {
     "type": "git",

@@ -46,18 +46,14 @@ const loadParse = () => {
         // Fallback to regular parse
         Parse = require('parse');
       } catch (fallbackError) {
-        throw new Error(
-          'Parse SDK not found. Please install parse package: npm install parse'
-        );
+        throw new Error('Parse SDK not found. Please install parse package: npm install parse');
       }
     }
   } else {
     try {
       Parse = require('parse');
     } catch (e) {
-      throw new Error(
-        'Parse SDK not found. Please install parse package: npm install parse'
-      );
+      throw new Error('Parse SDK not found. Please install parse package: npm install parse');
     }
   }
 };
