@@ -38,11 +38,7 @@ https://imana97.github.io/parse-mobx/
 Parse-MobX requires **MobX** and **Parse SDK** as peer dependencies:
 
 ```bash
-# For web/Node.js projects
 npm install parse-mobx mobx parse
-
-# For React Native projects
-npm install parse-mobx mobx parse/react-native
 
 # For TypeScript projects, also install types
 npm install -D @types/parse
@@ -61,27 +57,10 @@ npm install -D @types/parse
 First, initialize Parse and configure ParseMobx:
 
 ```typescript
-// For web/Node.js projects
 import Parse from 'parse';
 import { configureParseMobx } from 'parse-mobx';
 
 // Initialize Parse
-Parse.initialize(
-  'YOUR_APP_ID',
-  'YOUR_JAVASCRIPT_KEY'
-);
-Parse.serverURL = 'https://your-parse-server.com/parse';
-
-// Configure ParseMobx with your Parse instance
-configureParseMobx(Parse);
-```
-
-```typescript
-// For React Native projects
-import Parse from 'parse/react-native';
-import { configureParseMobx } from 'parse-mobx/react-native';
-
-// Initialize Parse for React Native
 Parse.initialize(
   'YOUR_APP_ID',
   'YOUR_JAVASCRIPT_KEY'
@@ -620,25 +599,7 @@ async toggleTodoOptimistic(todo: ParseMobx) {
 
 This example demonstrates the full power of parse-mobx with reactive UI updates, real-time synchronization, and clean separation of concerns using MobX stores!
 
-## 📱 React Native Usage
 
-For React Native projects, use the React Native entry point:
-
-```typescript
-import Parse from 'parse/react-native';
-import { ParseMobx, MobxStore, configureParseMobx } from 'parse-mobx/react-native';
-
-// Initialize Parse for React Native
-Parse.initialize('YOUR_APP_ID', 'YOUR_JS_KEY');
-Parse.serverURL = 'https://your-parse-server.com/parse';
-
-// Configure ParseMobx
-configureParseMobx(Parse);
-
-// Use just like in web projects
-const store = new MobxStore('Todo');
-store.fetchObjects();
-```
 
 ## 🧪 Testing
 

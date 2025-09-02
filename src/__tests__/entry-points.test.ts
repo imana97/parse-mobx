@@ -7,15 +7,8 @@ const mockParse = {
   Query: jest.fn(),
   Attributes: {},
 };
-const mockParseReactNative = {
-  version: 'react-native-parse',
-  Object: jest.fn(),
-  Query: jest.fn(),
-  Attributes: {},
-};
 
 jest.mock('parse', () => mockParse, { virtual: true });
-jest.mock('parse/react-native', () => mockParseReactNative, { virtual: true });
 
 describe('Entry Points', () => {
   let globalParseBackup: any;
@@ -58,25 +51,7 @@ describe('Entry Points', () => {
     });
   });
 
-  describe('React Native Entry Point (parse-mobx/react-native)', () => {
-    test('should export ParseMobx and MobxStore classes', async () => {
-      // Import the react-native entry point
-      const { ParseMobx, MobxStore } = await import('../react-native');
 
-      // Verify classes are exported
-      expect(ParseMobx).toBeDefined();
-      expect(typeof ParseMobx).toBe('function');
-      expect(MobxStore).toBeDefined();
-      expect(typeof MobxStore).toBe('function');
-    });
-
-    test('should export configureParseMobx function', async () => {
-      const { configureParseMobx } = await import('../react-native');
-
-      expect(configureParseMobx).toBeDefined();
-      expect(typeof configureParseMobx).toBe('function');
-    });
-  });
 
   describe('Configuration System', () => {
     test('configureParseMobx should be available from main entry point', async () => {
@@ -86,12 +61,7 @@ describe('Entry Points', () => {
       expect(typeof configureParseMobx).toBe('function');
     });
 
-    test('configureParseMobx should be available from react-native entry point', async () => {
-      const { configureParseMobx } = await import('../react-native');
 
-      expect(configureParseMobx).toBeDefined();
-      expect(typeof configureParseMobx).toBe('function');
-    });
 
     test('configureParseMobx should accept valid Parse instance', async () => {
       const { configureParseMobx } = await import('../config');
@@ -145,18 +115,6 @@ describe('Entry Points', () => {
       expect(typeof MobxStore).toBe('function');
     });
 
-    test('ParseMobx should be available after react-native entry import', async () => {
-      const { ParseMobx } = await import('../react-native');
 
-      expect(ParseMobx).toBeDefined();
-      expect(typeof ParseMobx).toBe('function');
-    });
-
-    test('MobxStore should be available after react-native entry import', async () => {
-      const { MobxStore } = await import('../react-native');
-
-      expect(MobxStore).toBeDefined();
-      expect(typeof MobxStore).toBe('function');
-    });
   });
 });

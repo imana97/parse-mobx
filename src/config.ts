@@ -3,7 +3,7 @@ let parseInstance: any = null;
 
 /**
  * Configure the Parse instance to use with ParseMobx
- * @param parse - The Parse instance (from 'parse' or 'parse/react-native')
+ * @param parse - The Parse instance (from 'parse')
  */
 export function configureParseMobx(parse: any): void {
   if (!parse) {
