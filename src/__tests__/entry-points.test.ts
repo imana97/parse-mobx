@@ -51,8 +51,6 @@ describe('Entry Points', () => {
     });
   });
 
-
-
   describe('Configuration System', () => {
     test('configureParseMobx should be available from main entry point', async () => {
       const { configureParseMobx } = await import('../index');
@@ -60,8 +58,6 @@ describe('Entry Points', () => {
       expect(configureParseMobx).toBeDefined();
       expect(typeof configureParseMobx).toBe('function');
     });
-
-
 
     test('configureParseMobx should accept valid Parse instance', async () => {
       const { configureParseMobx } = await import('../config');
@@ -114,7 +110,5 @@ describe('Entry Points', () => {
       expect(MobxStore).toBeDefined();
       expect(typeof MobxStore).toBe('function');
     });
-
-
   });
 });
