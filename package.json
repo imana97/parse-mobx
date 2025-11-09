@@ -50,8 +50,8 @@
   },
   "homepage": "https://github.com/imana97/parse-mobx#readme",
   "peerDependencies": {
-    "mobx": "^6.13.0",
-    "parse": "^6.1.1"
+    "mobx": ">=6.0.0",
+    "parse": ">=6.0.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
