@@ -250,7 +250,10 @@ describe('MobxStore', () => {
 
       store.onCreate(createCallback);
 
-      expect((store as any).createCallback).toBe(createCallback);
+      // Verify the callback was set by calling it
+      const parseMobxObj = new ParseMobx(mockParseObject as any);
+      (store as any).createCallback(parseMobxObj);
+      expect(createCallback).toHaveBeenCalledWith(parseMobxObj);
     });
 
     test('onUpdate should set update callback', () => {
@@ -258,7 +261,10 @@ describe('MobxStore', () => {
 
       store.onUpdate(updateCallback);
 
-      expect((store as any).updateCallback).toBe(updateCallback);
+      // Verify the callback was set by calling it
+      const parseMobxObj = new ParseMobx(mockParseObject as any);
+      (store as any).updateCallback(parseMobxObj);
+      expect(updateCallback).toHaveBeenCalledWith(parseMobxObj);
     });
 
     test('onEnter should set enter callback', () => {
@@ -266,7 +272,10 @@ describe('MobxStore', () => {
 
       store.onEnter(enterCallback);
 
-      expect((store as any).enterCallback).toBe(enterCallback);
+      // Verify the callback was set by calling it
+      const parseMobxObj = new ParseMobx(mockParseObject as any);
+      (store as any).enterCallback(parseMobxObj);
+      expect(enterCallback).toHaveBeenCalledWith(parseMobxObj);
     });
 
     test('onLeave should set leave callback', () => {
@@ -274,7 +283,10 @@ describe('MobxStore', () => {
 
       store.onLeave(leaveCallback);
 
-      expect((store as any).leaveCallback).toBe(leaveCallback);
+      // Verify the callback was set by calling it
+      const parseMobxObj = new ParseMobx(mockParseObject as any);
+      (store as any).leaveCallback(parseMobxObj);
+      expect(leaveCallback).toHaveBeenCalledWith(parseMobxObj);
     });
 
     test('onDelete should set delete callback', () => {
@@ -282,7 +294,10 @@ describe('MobxStore', () => {
 
       store.onDelete(deleteCallback);
 
-      expect((store as any).deleteCallback).toBe(deleteCallback);
+      // Verify the callback was set by calling it
+      const parseMobxObj = new ParseMobx(mockParseObject as any);
+      (store as any).deleteCallback(parseMobxObj);
+      expect(deleteCallback).toHaveBeenCalledWith(parseMobxObj);
     });
 
     test('default callbacks should return the object', () => {

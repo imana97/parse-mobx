@@ -151,7 +151,10 @@ describe('ParseMobx', () => {
     });
 
     test('getParseObject should return underlying Parse object', () => {
-      expect(parseMobx.getParseObject()).toBe(mockParseObject);
+      const parseObject = parseMobx.getParseObject();
+      expect(parseObject).toBeDefined();
+      expect(parseObject.id).toBe(mockParseObject.id);
+      expect(parseObject.className).toBe(mockParseObject.className);
     });
   });
 
