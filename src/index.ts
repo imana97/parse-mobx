@@ -53,7 +53,7 @@ export class ParseMobx {
 
     // copy id
     this.id = obj.id;
-    
+
     // Initialize attributes as an observable object
     const initialAttributes: Parse.Attributes = { createdAt: obj.get('createdAt') };
 
@@ -583,14 +583,14 @@ export class ParseMobx {
     if (value.constructor.name === 'ParseACL') {
       throw new Error('Please use setACL() instead');
     }
-    
+
     // if it is parse subclass, create parse object.
     if (value.constructor.name === 'ParseObjectSubclass') {
       this.attributes[key] = new ParseMobx(value);
     } else {
       this.attributes[key] = value;
     }
-    
+
     this.parseObj.set(key, value, options);
     return this;
   }
@@ -790,7 +790,7 @@ export class MobxStore {
    */
   constructor(parseClassName: string) {
     this.parseClassName = parseClassName;
-    
+
     // Make this instance observable (readonly and private properties are auto-excluded)
     makeAutoObservable(this);
   }
@@ -811,7 +811,7 @@ export class MobxStore {
           this.objects = ParseMobx.toParseMobx(objects) as any;
         });
       } catch (error: any) {
-        runInAction(() => { 
+        runInAction(() => {
           this.loading = false;
           this.parseError = error;
         });
@@ -873,7 +873,7 @@ export class MobxStore {
           ParseMobx.deleteListItemById(this.objects, obj);
         });
       } catch (error: any) {
-        runInAction(() => { 
+        runInAction(() => {
           this.loading = false;
           this.parseError = error;
         });
